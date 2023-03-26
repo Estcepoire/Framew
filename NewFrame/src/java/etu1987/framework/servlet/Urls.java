@@ -15,10 +15,6 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-/**
- *
- * @author ASUS
- */
 public @interface Urls {
      String nom()default "";
 }

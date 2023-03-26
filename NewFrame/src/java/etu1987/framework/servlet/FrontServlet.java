@@ -6,8 +6,12 @@ package etu1987.framework.servlet;
  * and open the template in the editor.
  */
 
+import etu1987.framework.FonctionURL;
+import etu1987.framework.Mapping;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +22,12 @@ import javax.servlet.http.HttpServletResponse;
  * @author ASUS
  */
 public class FrontServlet extends HttpServlet {
+    Map<String,Mapping> mappingUrls = new HashMap<>();
 
+    @Override
+    public void init() throws ServletException {
+    //    super.init(); //To change body of generated methods, choose Tools | Templates.
+    }
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -32,7 +41,15 @@ public class FrontServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
+            /* TODO output your page here. You may use following sample code. */
+            mappingUrls = FonctionURL.fonction();
+            mappingUrls.entrySet().stream().map((u) -> {
+                System.out.println("huhu");
+                return u;
+            }).forEachOrdered((u) -> {
+                System.out.println(u.getKey() + " : " + u.getValue().getClassName()+ " || " + u.getValue().getMethode());
+            });
+            out.println(request.getContextPath()+request.getServletPath()+ "?" +request.getQueryString());
         }
     }
 

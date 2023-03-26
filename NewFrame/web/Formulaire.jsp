@@ -13,7 +13,7 @@
     </head>
     <body>
         <form action="FrontServlet" method="get">
-            <input type="text"  >
+            <input type="text" name="teste" >
         </form>
         
     </body>
