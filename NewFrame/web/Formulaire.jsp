@@ -12,6 +12,9 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <form action="FrontServlet" method="get">
+            <input type="text"  >
+        </form>
+        
     </body>
 </html>
