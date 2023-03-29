@@ -14,6 +14,7 @@
     <body>
         <form action="FrontServlet" method="get">
             <input type="text" name="teste" >
+            <input type="submit" value="submit" >
         </form>
         
     </body>
