@@ -43,11 +43,10 @@ public class FrontServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             mappingUrls = FonctionURL.fonction();
-            mappingUrls.entrySet().stream().map((u) -> {
-                System.out.println("huhu");
-                return u;
-            }).forEachOrdered((u) -> {
-                System.out.println(u.getKey() + " : " + u.getValue().getClassName()+ " || " + u.getValue().getMethode());
+            mappingUrls.entrySet().stream().map((ma) -> {
+                return ma;
+            }).forEachOrdered((ma) -> {
+                System.out.println(ma.getKey() + " : " + ma.getValue().getClassName()+ " || " + ma.getValue().getMethode());
             });
             out.println(request.getContextPath()+request.getServletPath()+ "?" +request.getQueryString());
         }
