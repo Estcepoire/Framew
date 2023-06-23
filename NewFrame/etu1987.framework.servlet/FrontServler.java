@@ -1,8 +1,0 @@
-
-/**
- * FrontServler
- */
-public class FrontServler {
-
-
-}
