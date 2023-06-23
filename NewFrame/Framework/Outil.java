@@ -1,4 +1,4 @@
-package NewFrame.etu1987.framework;
+package etu1987.framework;
 
 import java.io.File;
 import java.net.URL;
