@@ -1,12 +1,30 @@
 package Test;
 
 import etu1987.framework.Url;
+
+import java.sql.Date;
+
 import etu1987.framework.Modelview;
 
 public class Emp {
     String nom;
     Integer t;
+    java.sql.Date daty;
+    java.util.Date da;
 
+    public void setDa(java.util.Date da) {
+        this.da = da;
+    }
+
+    public java.util.Date getDa() {
+        return da;
+    }
+    public void setDaty(java.sql.Date daty) {
+        this.daty = daty;
+    }
+    public java.sql.Date getDaty() {
+        return daty;
+    }
     public void setT(Integer t) {
         this.t = t;
     }
@@ -35,6 +53,8 @@ public class Emp {
         Modelview m = new Modelview();
         m.setView("Ay.jsp");
         System.out.println(this.getNom());
+        System.out.println(this.getDaty());
+        System.out.println(this.getDa());
         return m;
     }
 
