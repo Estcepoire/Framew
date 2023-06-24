@@ -2,6 +2,7 @@ package Test;
 
 import etu1987.framework.Url;
 import etu1987.framework.Annotation;
+import etu1987.framework.FileUploader;
 
 import java.sql.Date;
 
@@ -13,6 +14,14 @@ public class Emp {
     java.sql.Date daty;
     java.util.Date da;
     String[] table;
+    FileUploader file;
+
+    public void setFile(FileUploader file) {
+        this.file = file;
+    }
+    public FileUploader getFile() {
+        return file;
+    }
 
     public String[] getTable() {
         return table;
@@ -51,8 +60,6 @@ public class Emp {
     public Modelview FindAll() {
         Modelview m = new Modelview();
         m.setView("Ay.jsp");
-        // int u = 23;
-        // m.addItem("data", u);
         System.out.println(" find_all ");
         return m;
     }
@@ -60,10 +67,8 @@ public class Emp {
     @Url(url="get-form")
     public Modelview getForm() {
         Modelview m = new Modelview();
+        System.out.println(this.getFile().getName());
         m.setView("Ay.jsp");
-        for (int i = 0; i < table.length; i++) {
-            System.out.println(table[i]);
-        }
         return m;
     }
     
