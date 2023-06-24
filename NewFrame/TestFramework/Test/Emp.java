@@ -1,13 +1,14 @@
 package Test;
 
 import etu1987.framework.Url;
+import etu1987.framework.Scope;
 import etu1987.framework.Annotation;
 import etu1987.framework.FileUploader;
 
 import java.sql.Date;
 
 import etu1987.framework.Modelview;
-
+@Scope(type="Emp")
 public class Emp {
     String nom;
     Integer t;
@@ -75,7 +76,6 @@ public class Emp {
     @Url(url = "parameter-type")
     public Modelview params(@Annotation(parametre = "test") Integer test) {
         Modelview m = new Modelview();
-        System.out.println(test);
         m.setView("Ay.jsp");
         return m;
     }
