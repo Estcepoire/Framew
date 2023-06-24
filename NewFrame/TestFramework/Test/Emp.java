@@ -1,6 +1,7 @@
 package Test;
 
 import etu1987.framework.Url;
+import etu1987.framework.Annotation;
 
 import java.sql.Date;
 
@@ -50,8 +51,8 @@ public class Emp {
     public Modelview FindAll() {
         Modelview m = new Modelview();
         m.setView("Ay.jsp");
-        int u = 23;
-        m.addItem("data", u);
+        // int u = 23;
+        // m.addItem("data", u);
         System.out.println(" find_all ");
         return m;
     }
@@ -63,6 +64,14 @@ public class Emp {
         for (int i = 0; i < table.length; i++) {
             System.out.println(table[i]);
         }
+        return m;
+    }
+    
+    @Url(url = "parameter-type")
+    public Modelview params(@Annotation(parametre = "test") Integer test) {
+        Modelview m = new Modelview();
+        System.out.println(test);
+        m.setView("Ay.jsp");
         return m;
     }
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import etu1987.framework.Annotation;
 import etu1987.framework.Mapping;
 import etu1987.framework.Modelview;
 import etu1987.framework.Outil;
@@ -64,7 +66,7 @@ public class FrontServlet extends HttpServlet {
                     Enumeration<String> nom = request.getParameterNames();
                     List<String> list = Collections.list(nom);
                     for (int w = 0; w < fields.length; w++) {
-                        String table = fields[w].getName() + ((fields[w].getType().isArray())? "[]":"");
+                        String table = fields[w].getName() + ((fields[w].getType().isArray()) ? "[]" : "");
                         for (int g = 0; g < list.size(); g++) {
                             if (table.trim().equals(list.get(g).trim())) {
                                 String s1 = fields[w].getName().substring(0, 1).toUpperCase();
@@ -84,10 +86,9 @@ public class FrontServlet extends HttpServlet {
                                                 .newInstance(object2);
                                         me.invoke(object, obj);
                                     }
-                                }
-                                else {
+                                } else {
                                     String[] strings = request.getParameterValues(table);
-                                    me.invoke(object,(Object) strings);
+                                    me.invoke(object, (Object) strings);
                                 }
                             }
                         }
@@ -95,12 +96,44 @@ public class FrontServlet extends HttpServlet {
                     Method[] methods = object.getClass().getDeclaredMethods();
                     Method equalMethod = null;
                     for (int i = 0; i < methods.length; i++) {
-                        if (methods[i].getName().trim().compareTo(mapping.getMethod())==0) {
+                        if (methods[i].getName().trim().compareTo(mapping.getMethod()) == 0) {
                             equalMethod = methods[i];
                             break;
                         }
                     }
-                    Object returnObject = equalMethod.invoke(object);
+                    Parameter[] parameters = equalMethod.getParameters();
+                    System.out.println(parameters);
+                    Object[] params = new Object[parameters.length];
+                    // 
+                    for (int w = 0; w < parameters.length; w++) {
+                        if (parameters[w].isAnnotationPresent(Annotation.class)) {
+                            Annotation pAnnotation = parameters[w].getAnnotation(Annotation.class);
+                            String table = pAnnotation.parametre() + ((parameters[w].getType().isArray()) ? "[]" : "");
+                            for (int g = 0; g < list.size(); g++) {
+                                if (table.trim().equals(list.get(g).trim())) {
+                                    if (parameters[w].getType().isArray() == false) {
+                                        String object2 = request.getParameter(pAnnotation.parametre());
+                                        if (parameters[w].getType() == java.util.Date.class) {
+                                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                                            Date obj = format.parse(object2);
+                                            params[w]=obj;
+                                        } else if (parameters[w].getType() == java.sql.Date.class) {
+                                            java.sql.Date obj = java.sql.Date.valueOf(object2);
+                                            params[w]=obj;
+                                        } else {
+                                            Object obj = parameters[w].getType().getConstructor(String.class).newInstance(object2);
+                                            params[w]=obj;
+                                        }
+                                    } else {
+                                        String[] strings = request.getParameterValues(table);
+                                        params[w] = strings;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // 
+                    Object returnObject = equalMethod.invoke(object, (Object[]) params);
                     if (returnObject instanceof Modelview) {
                         Modelview modelview = (Modelview) returnObject;
                         HashMap<String, Object> data = modelview.getData();
