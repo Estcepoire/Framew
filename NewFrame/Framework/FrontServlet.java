@@ -7,12 +7,16 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import javax.management.modelmbean.RequiredModelMBean;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import etu1987.framework.Mapping;
+import etu1987.framework.Modelview;
 import etu1987.framework.Outil;
 import etu1987.framework.Url;
 
@@ -43,7 +47,29 @@ public class FrontServlet extends HttpServlet {
     public void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (PrintWriter out = response.getWriter()) {
-            out.println(" HAHAHAHAHAHAHAHAHAHAAHA ");
+            String url = request.getRequestURI().substring(request.getContextPath().length()+1);
+            if (this.mappingUrls.containsKey(url))
+                {
+                    Mapping mapping = this.mappingUrls.get(url);
+                    Class clazz = Class.forName(mapping.getClassName());
+                    Object object = clazz.getConstructor().newInstance();
+                    Method[] methods = object.getClass().getDeclaredMethods();
+                    Method equalMethod = null;
+                    for (int i = 0; i < methods.length; i++) {
+                        if (methods[i].getName().trim().compareTo(mapping.getMethod())==0) {
+                            equalMethod = methods[i];
+                            break;
+                        }
+                    }
+                    Object[] objects = new Object[1];
+                    Object returnObject = equalMethod.invoke(object);
+                    if (returnObject instanceof Modelview) {
+                        Modelview modelview = (Modelview) returnObject;
+                        RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
+                        requestDispatcher.forward(request, response);
+                    }
+            }
+        }catch (Exception e) {
         }
     }
 
