@@ -101,6 +101,7 @@ public class FrontServlet extends HttpServlet {
                             break;
                         }
                     }
+                    
                     Parameter[] parameters = equalMethod.getParameters();
                     System.out.println(parameters);
                     Object[] params = new Object[parameters.length];
