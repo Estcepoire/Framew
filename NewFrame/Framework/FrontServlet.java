@@ -1,12 +1,15 @@
 package etu1987.framework.servlet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -17,13 +20,13 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.management.modelmbean.RequiredModelMBean;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import javax.servlet.annotation.*;
+import javax.servlet.http.*;
+
 
 import etu1987.framework.Annotation;
+import etu1987.framework.FileUploader;
 import etu1987.framework.Mapping;
 import etu1987.framework.Modelview;
 import etu1987.framework.Outil;
@@ -32,6 +35,7 @@ import etu1987.framework.Url;
 /**
  * FrontServler
  */
+@MultipartConfig
 public class FrontServlet extends HttpServlet {
     HashMap<String, Mapping> mappingUrls = new HashMap<String, Mapping>();
 
@@ -53,6 +57,47 @@ public class FrontServlet extends HttpServlet {
         }
     }
 
+    // File traitement part
+    private FileUploader fileTraitement(Collection<Part> files, Field field) {
+        FileUploader file = new FileUploader();
+        String name = field.getName();
+        boolean exists = false;
+        String filename = null;
+        Part filepart = null;
+        for (Part part : files) {
+            if (part.getName().equals(name)) {
+                filepart = part;
+                exists = true;
+                break;
+            }
+        }
+        try (InputStream io = filepart.getInputStream()) {
+            ByteArrayOutputStream buffers = new ByteArrayOutputStream();
+            byte[] buffer = new byte[(int) filepart.getSize()];
+            int read;
+            while ((read = io.read(buffer, 0, buffer.length)) != -1) {
+                buffers.write(buffer, 0, read);
+            }
+            file.setName(this.getFileName(filepart));
+            file.setBytes(buffers.toByteArray());
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    //
+    //
+     private String getFileName(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        String[] parts = contentDisposition.split(";");
+        for (String partStr : parts) {
+            if (partStr.trim().startsWith("filename"))
+                return partStr.substring(partStr.indexOf('=') + 1).trim().replace("\"", "");
+        }
+        return null;
+    }
+    //
     public void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try (PrintWriter out = response.getWriter()) {
@@ -133,6 +178,22 @@ public class FrontServlet extends HttpServlet {
                             }
                         }
                     }
+                    // 
+                    try {
+                        Collection<Part> files = request.getParts();
+                        for (Field f : fields) {
+                            if (f.getType() == etu1987.framework.FileUploader.class) {
+                                String s1 = f.getName().substring(0, 1).toUpperCase();
+                                String seter = s1 + f.getName().substring(1);
+                                Method m = clazz.getMethod("set" + seter, f.getType());
+                                Object o = this.fileTraitement(files, f);
+                                m.invoke(object, o);
+                            }
+                        }
+                    } catch (Exception e) {
+                        
+                    }
+
                     // 
                     Object returnObject = equalMethod.invoke(object, (Object[]) params);
                     if (returnObject instanceof Modelview) {
