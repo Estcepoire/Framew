@@ -64,24 +64,30 @@ public class FrontServlet extends HttpServlet {
                     Enumeration<String> nom = request.getParameterNames();
                     List<String> list = Collections.list(nom);
                     for (int w = 0; w < fields.length; w++) {
+                        String table = fields[w].getName() + ((fields[w].getType().isArray())? "[]":"");
                         for (int g = 0; g < list.size(); g++) {
-                            if (fields[w].getName().trim().equals(list.get(g).trim())) {
-                                String s1 = list.get(g).substring(0, 1).toUpperCase();
-                                String seter = s1 + list.get(g).substring(1);
+                            if (table.trim().equals(list.get(g).trim())) {
+                                String s1 = fields[w].getName().substring(0, 1).toUpperCase();
+                                String seter = s1 + fields[w].getName().substring(1);
                                 Method me = clazz.getMethod("set" + seter, fields[w].getType());
-                                String object2 = request.getParameter(fields[w].getName());
-                                if (fields[w].getType() == java.util.Date.class) {
-                                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
-                                    Date obj = format.parse(object2);
-                                    me.invoke(object, obj);
-                                }
-                                else if (fields[w].getType() == java.sql.Date.class) {
-                                    java.sql.Date obj = java.sql.Date.valueOf(object2);
-                                    me.invoke(object, obj);
+                                if (fields[w].getType().isArray() == false) {
+                                    String object2 = request.getParameter(fields[w].getName());
+                                    if (fields[w].getType() == java.util.Date.class) {
+                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                                        Date obj = format.parse(object2);
+                                        me.invoke(object, obj);
+                                    } else if (fields[w].getType() == java.sql.Date.class) {
+                                        java.sql.Date obj = java.sql.Date.valueOf(object2);
+                                        me.invoke(object, obj);
+                                    } else {
+                                        Object obj = fields[w].getType().getConstructor(String.class)
+                                                .newInstance(object2);
+                                        me.invoke(object, obj);
+                                    }
                                 }
                                 else {
-                                    Object obj = fields[w].getType().getConstructor(String.class).newInstance(object2);
-                                    me.invoke(object, obj);
+                                    String[] strings = request.getParameterValues(table);
+                                    me.invoke(object,(Object) strings);
                                 }
                             }
                         }

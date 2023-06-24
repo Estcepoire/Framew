@@ -11,6 +11,14 @@ public class Emp {
     Integer t;
     java.sql.Date daty;
     java.util.Date da;
+    String[] table;
+
+    public String[] getTable() {
+        return table;
+    }
+    public void setTable(String[] table) {
+        this.table = table;
+    }
 
     public void setDa(java.util.Date da) {
         this.da = da;
@@ -52,9 +60,9 @@ public class Emp {
     public Modelview getForm() {
         Modelview m = new Modelview();
         m.setView("Ay.jsp");
-        System.out.println(this.getNom());
-        System.out.println(this.getDaty());
-        System.out.println(this.getDa());
+        for (int i = 0; i < table.length; i++) {
+            System.out.println(table[i]);
+        }
         return m;
     }
 
