@@ -31,6 +31,7 @@ import etu1987.framework.Mapping;
 import etu1987.framework.Modelview;
 import etu1987.framework.Outil;
 import etu1987.framework.Url;
+import etu1987.framework.Scope;
 
 /**
  * FrontServler
@@ -38,6 +39,7 @@ import etu1987.framework.Url;
 @MultipartConfig
 public class FrontServlet extends HttpServlet {
     HashMap<String, Mapping> mappingUrls = new HashMap<String, Mapping>();
+    HashMap<String, Object> singleton = new HashMap<String, Object>();
 
     public void init() {
         String name_package = "Test";
@@ -50,6 +52,11 @@ public class FrontServlet extends HttpServlet {
                     if (methods[j].isAnnotationPresent(Url.class)) {
                         Mapping mapping = new Mapping(class_Temp.getName(), methods[j].getName());
                         this.mappingUrls.put(methods[j].getAnnotation(Url.class).url(), mapping);
+                    }
+                }
+                for (int j = 0; j < all_Class.size(); j++) {
+                    if (all_Class.get(j).isAnnotationPresent(Scope.class)) {
+                        this.singleton.put(all_Class.get(j).getName(), null);
                     }
                 }
             }
@@ -107,7 +114,18 @@ public class FrontServlet extends HttpServlet {
                     Mapping mapping = this.mappingUrls.get(url);
                     Class clazz = Class.forName(mapping.getClassName());
                     Field[] fields = clazz.getDeclaredFields();
-                    Object object = clazz.getConstructor().newInstance();
+                    Object object = null;
+                    if (this.singleton.containsKey(clazz.getName())) {
+                        if (this.singleton.get(clazz.getName()) != null) {
+                            object = this.singleton.get(clazz.getName());
+                        } else {
+                            object = clazz.getConstructor().newInstance();
+                            this.singleton.replace(clazz.getName(), null, object);
+                        }
+                    } else {
+                        object = clazz.getConstructor().newInstance();
+                    }
+                    System.out.println(object);
                     Enumeration<String> nom = request.getParameterNames();
                     List<String> list = Collections.list(nom);
                     for (int w = 0; w < fields.length; w++) {
