@@ -5,10 +5,13 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -67,8 +70,19 @@ public class FrontServlet extends HttpServlet {
                                 String seter = s1 + list.get(g).substring(1);
                                 Method me = clazz.getMethod("set" + seter, fields[w].getType());
                                 String object2 = request.getParameter(fields[w].getName());
-                                Object obj = fields[w].getType().getConstructor(String.class).newInstance(object2);
-                                me.invoke(object, obj);
+                                if (fields[w].getType() == java.util.Date.class) {
+                                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
+                                    Date obj = format.parse(object2);
+                                    me.invoke(object, obj);
+                                }
+                                else if (fields[w].getType() == java.sql.Date.class) {
+                                    java.sql.Date obj = java.sql.Date.valueOf(object2);
+                                    me.invoke(object, obj);
+                                }
+                                else {
+                                    Object obj = fields[w].getType().getConstructor(String.class).newInstance(object2);
+                                    me.invoke(object, obj);
+                                }
                             }
                         }
                     }
