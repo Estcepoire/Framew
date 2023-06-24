@@ -2,8 +2,11 @@ package etu1987.framework.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +56,22 @@ public class FrontServlet extends HttpServlet {
                 {
                     Mapping mapping = this.mappingUrls.get(url);
                     Class clazz = Class.forName(mapping.getClassName());
+                    Field[] fields = clazz.getDeclaredFields();
                     Object object = clazz.getConstructor().newInstance();
+                    Enumeration<String> nom = request.getParameterNames();
+                    List<String> list = Collections.list(nom);
+                    for (int w = 0; w < fields.length; w++) {
+                        for (int g = 0; g < list.size(); g++) {
+                            if (fields[w].getName().trim().equals(list.get(g).trim())) {
+                                String s1 = list.get(g).substring(0, 1).toUpperCase();
+                                String seter = s1 + list.get(g).substring(1);
+                                Method me = clazz.getMethod("set" + seter, fields[w].getType());
+                                String object2 = request.getParameter(fields[w].getName());
+                                Object obj = fields[w].getType().getConstructor(String.class).newInstance(object2);
+                                me.invoke(object, obj);
+                            }
+                        }
+                    }
                     Method[] methods = object.getClass().getDeclaredMethods();
                     Method equalMethod = null;
                     for (int i = 0; i < methods.length; i++) {
@@ -62,7 +80,6 @@ public class FrontServlet extends HttpServlet {
                             break;
                         }
                     }
-                    Object[] objects = new Object[1];
                     Object returnObject = equalMethod.invoke(object);
                     if (returnObject instanceof Modelview) {
                         Modelview modelview = (Modelview) returnObject;
@@ -73,7 +90,7 @@ public class FrontServlet extends HttpServlet {
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                         requestDispatcher.forward(request, response);
                     }
-            }
+                }
         } catch (Exception e) {
             e.printStackTrace();
         }
