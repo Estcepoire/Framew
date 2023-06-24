@@ -9,6 +9,8 @@ public class Emp {
     public Modelview FindAll() {
         Modelview m = new Modelview();
         m.setView("Ay.jsp");
+        int u = 23;
+        m.addItem("data", u);
         System.out.println(" find_all ");
         return m;
     }

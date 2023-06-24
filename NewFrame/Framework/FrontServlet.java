@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.management.modelmbean.RequiredModelMBean;
@@ -65,11 +66,16 @@ public class FrontServlet extends HttpServlet {
                     Object returnObject = equalMethod.invoke(object);
                     if (returnObject instanceof Modelview) {
                         Modelview modelview = (Modelview) returnObject;
+                        HashMap<String, Object> data = modelview.getData();
+                        for (Map.Entry<String,Object> o : data.entrySet()) {
+                            request.setAttribute( o.getKey() , o.getValue() );
+                        }
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                         requestDispatcher.forward(request, response);
                     }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
