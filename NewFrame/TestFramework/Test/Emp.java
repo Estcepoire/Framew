@@ -90,6 +90,8 @@ public class Emp {
     @Url(url = "parameter-type")
     public Modelview params(@Annotation(parametre = "test") Integer test) {
         Modelview m = new Modelview();
+        m.addItem("data", "data");
+        m.setGson(true);
         m.setView("Ay.jsp");
         return m;
     }

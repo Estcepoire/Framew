@@ -5,5 +5,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 
 public @interface Authentication {
-    String profile() default " ";
+    String profile() default "";
 }
