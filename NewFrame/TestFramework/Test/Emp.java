@@ -6,6 +6,7 @@ import etu1987.framework.Annotation;
 import etu1987.framework.FileUploader;
 import etu1987.framework.Authentication;
 import etu1987.framework.Session;
+import etu1987.framework.RestAPI;
 
 import java.sql.Date;
 import java.util.HashMap;
@@ -111,6 +112,14 @@ public class Emp {
         Modelview m = new Modelview();
         this.getSession().put("profile", "test");
         m.setView("index.jsp");
+        return m;
+    }
+    @RestAPI()
+    @Url(url = "list")
+    public Emp ListEmp() {
+        Emp m = new Emp();
+        m.setNom("RAKPO");
+        m.setT(12);
         return m;
     }
 
