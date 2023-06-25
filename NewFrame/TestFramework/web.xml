@@ -10,6 +10,14 @@
     <servlet>
         <servlet-name>FrontServlet</servlet-name>
         <servlet-class>etu1987.framework.servlet.FrontServlet</servlet-class>
+        <init-param>
+            <param-name>sessionName</param-name>
+            <param-value>isConnected</param-value>
+        </init-param>
+        <init-param>
+            <param-name>sessionProfile</param-name>
+            <param-value>profile</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>
