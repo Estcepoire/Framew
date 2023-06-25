@@ -5,12 +5,15 @@ import etu1987.framework.Scope;
 import etu1987.framework.Annotation;
 import etu1987.framework.FileUploader;
 import etu1987.framework.Authentication;
+import etu1987.framework.Session;
 
 import java.sql.Date;
+import java.util.HashMap;
 
 import etu1987.framework.Modelview;
 @Scope(type="Emp")
 public class Emp {
+    HashMap<String, Object> session; //tsy maintsy session nenatarany
     String nom;
     Integer t;
     java.sql.Date daty;
@@ -18,6 +21,13 @@ public class Emp {
     String[] table;
     FileUploader file;
 
+
+    public void setSession(HashMap<String, Object> session) {
+        this.session = session;
+    }
+    public HashMap<String, Object> getSession() {
+        return session;
+    }
     public void setFile(FileUploader file) {
         this.file = file;
     }
@@ -88,7 +98,16 @@ public class Emp {
     public Modelview login() {
         Modelview m = new Modelview();
         m.addSession("isConnected", true);
-        m.addSession("profile","admin");
+        m.addSession("profile", "admin");
+        m.setView("index.jsp");
+        return m;
+    }
+    
+    @Session
+    @Url(url = "session")
+    public Modelview testSession() {
+        Modelview m = new Modelview();
+        this.getSession().put("profile", "test");
         m.setView("index.jsp");
         return m;
     }

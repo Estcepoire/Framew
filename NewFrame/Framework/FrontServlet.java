@@ -33,6 +33,7 @@ import etu1987.framework.Modelview;
 import etu1987.framework.Outil;
 import etu1987.framework.Url;
 import etu1987.framework.Scope;
+import etu1987.framework.Session;
 
 /**
  * FrontServler
@@ -221,15 +222,36 @@ public class FrontServlet extends HttpServlet {
                     Object returnObject = null;
                     if (equalMethod.isAnnotationPresent(Authentication.class)) {
                         Authentication auth = equalMethod.getAnnotation(Authentication.class);
-                        if (request.getSession().getAttribute(sessionName)!=null) {
-                            if ((auth.profile().isEmpty() == false && !auth.profile().equals(request.getSession().getAttribute(sessionProfile)))) {
+                        if (request.getSession().getAttribute(sessionName) != null) {
+                            if ((auth.profile().isEmpty() == false
+                                    && !auth.profile().equals(request.getSession().getAttribute(sessionProfile)))) {
                                 throw new Exception(" privilege non accorder ");
                             }
                         } else {
                             throw new Exception(" null  tsy misy session ");
                         }
                     }
+                    if (equalMethod.isAnnotationPresent(Session.class)) {
+                        Method method = clazz.getDeclaredMethod("setSession", HashMap.class);
+                        HashMap<String, Object> ses = new HashMap<String, Object>();
+                        Enumeration<String> noms = request.getSession().getAttributeNames();
+                        List<String> listeStrings = Collections.list(noms);
+                        for (String string : listeStrings) {
+                            Object temp = request.getSession().getAttribute(string);
+                            ses.put(string, temp);
+                        }
+                        method.invoke(object, ses);
+                    }
                     returnObject = equalMethod.invoke(object, (Object[]) params);
+
+                    if (equalMethod.isAnnotationPresent(Session.class)) {
+                        Method method = clazz.getDeclaredMethod("getSession");
+                        HashMap<String, Object> ses = new HashMap<String, Object>();
+                        ses = (HashMap<String, Object>)method.invoke(object);
+                        for (Map.Entry<String, Object> o : ses.entrySet()) {
+                            request.getSession().setAttribute(o.getKey(), o.getValue());
+                        }
+                    }
 
                     if (returnObject instanceof Modelview) {
                         Modelview modelview = (Modelview) returnObject;
