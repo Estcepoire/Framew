@@ -131,7 +131,6 @@ public class FrontServlet extends HttpServlet {
                     } else {
                         object = clazz.getConstructor().newInstance();
                     }
-                    System.out.println(object);
                     Enumeration<String> nom = request.getParameterNames();
                     List<String> list = Collections.list(nom);
                     for (int w = 0; w < fields.length; w++) {
@@ -172,7 +171,6 @@ public class FrontServlet extends HttpServlet {
                     }
                     
                     Parameter[] parameters = equalMethod.getParameters();
-                    System.out.println(parameters);
                     Object[] params = new Object[parameters.length];
                     // 
                     for (int w = 0; w < parameters.length; w++) {
@@ -223,8 +221,8 @@ public class FrontServlet extends HttpServlet {
                     if (equalMethod.isAnnotationPresent(Authentication.class)) {
                         Authentication auth = equalMethod.getAnnotation(Authentication.class);
                         if (request.getSession().getAttribute(sessionName) != null) {
-                            if ((auth.profile().isEmpty() == false
-                                    && !auth.profile().equals(request.getSession().getAttribute(sessionProfile)))) {
+                            if ((auth.profile().trim().isEmpty() == false
+                                    && !auth.profile().trim().equals(String.valueOf(request.getSession().getAttribute(sessionProfile)).trim()))) {
                                 throw new Exception(" privilege non accorder ");
                             }
                         } else {
@@ -263,8 +261,13 @@ public class FrontServlet extends HttpServlet {
                         for (Map.Entry<String, Object> o : session.entrySet()) {
                             request.getSession().setAttribute(o.getKey(), o.getValue());
                         }
-                        RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
-                        requestDispatcher.forward(request, response);
+                        if (modelview.isGson()) {
+                            response.setContentType("application/json");
+                            out.println(new com.google.gson.Gson().toJson(data));
+                        } else {
+                            RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
+                            requestDispatcher.forward(request, response);
+                        }
                     }
                 }
         } catch (Exception e) {

@@ -6,8 +6,15 @@ public class Modelview {
     String view;
     HashMap<String, Object> data = new HashMap<String, Object>();
     HashMap<String, Object> session = new HashMap<String, Object>();
+    boolean gson = false;
 
 
+    public void setGson(boolean isGson) {
+        this.gson = isGson;
+    }
+    public boolean isGson() {
+        return gson;
+    }
     public void setSession(HashMap<String, Object> session) {
         this.session = session;
     }
