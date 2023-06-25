@@ -4,6 +4,7 @@ import etu1987.framework.Url;
 import etu1987.framework.Scope;
 import etu1987.framework.Annotation;
 import etu1987.framework.FileUploader;
+import etu1987.framework.Authentication;
 
 import java.sql.Date;
 
@@ -54,14 +55,17 @@ public class Emp {
     public void setNom(String nom) {
         this.nom = nom;
     }
+
     public String getNom() {
         return nom;
     }
+    
+    @Authentication(profile = "admin")
     @Url(url="find-All")
     public Modelview FindAll() {
         Modelview m = new Modelview();
         m.setView("Ay.jsp");
-        System.out.println(" find_all ");
+        System.out.println(" Admin rery ");
         return m;
     }
     
@@ -72,11 +76,20 @@ public class Emp {
         m.setView("Ay.jsp");
         return m;
     }
-    
+    @Authentication()
     @Url(url = "parameter-type")
     public Modelview params(@Annotation(parametre = "test") Integer test) {
         Modelview m = new Modelview();
         m.setView("Ay.jsp");
+        return m;
+    }
+    
+    @Url(url = "login")
+    public Modelview login() {
+        Modelview m = new Modelview();
+        m.addSession("isConnected", true);
+        m.addSession("profile","admin");
+        m.setView("index.jsp");
         return m;
     }
 

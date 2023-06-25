@@ -26,6 +26,7 @@ import javax.servlet.http.*;
 
 
 import etu1987.framework.Annotation;
+import etu1987.framework.Authentication;
 import etu1987.framework.FileUploader;
 import etu1987.framework.Mapping;
 import etu1987.framework.Modelview;
@@ -40,10 +41,14 @@ import etu1987.framework.Scope;
 public class FrontServlet extends HttpServlet {
     HashMap<String, Mapping> mappingUrls = new HashMap<String, Mapping>();
     HashMap<String, Object> singleton = new HashMap<String, Object>();
+    String sessionName;
+    String sessionProfile;
 
     public void init() {
         String name_package = "Test";
         try {
+            sessionName = getInitParameter("sessionName");
+            sessionProfile = getInitParameter("sessionProfile");
             List<Class> all_Class = Outil.getClassFrom(name_package);
             for (int i = 0; i < all_Class.size(); i++) {
                 Class class_Temp = all_Class.get(i);
@@ -213,12 +218,28 @@ public class FrontServlet extends HttpServlet {
                     }
 
                     // 
-                    Object returnObject = equalMethod.invoke(object, (Object[]) params);
+                    Object returnObject = null;
+                    if (equalMethod.isAnnotationPresent(Authentication.class)) {
+                        Authentication auth = equalMethod.getAnnotation(Authentication.class);
+                        if (request.getSession().getAttribute(sessionName)!=null) {
+                            if ((auth.profile().isEmpty() == false && !auth.profile().equals(request.getSession().getAttribute(sessionProfile)))) {
+                                throw new Exception(" privilege non accorder ");
+                            }
+                        } else {
+                            throw new Exception(" null  tsy misy session ");
+                        }
+                    }
+                    returnObject = equalMethod.invoke(object, (Object[]) params);
+
                     if (returnObject instanceof Modelview) {
                         Modelview modelview = (Modelview) returnObject;
                         HashMap<String, Object> data = modelview.getData();
+                        HashMap<String, Object> session = modelview.getSession();
                         for (Map.Entry<String,Object> o : data.entrySet()) {
                             request.setAttribute( o.getKey() , o.getValue() );
+                        }
+                        for (Map.Entry<String, Object> o : session.entrySet()) {
+                            request.getSession().setAttribute(o.getKey(), o.getValue());
                         }
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                         requestDispatcher.forward(request, response);
