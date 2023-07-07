@@ -267,7 +267,14 @@ public class FrontServlet extends HttpServlet {
                     if (modelview.isGson()) {
                         response.setContentType("application/json");
                         out.println(new com.google.gson.Gson().toJson(data));
-                    } else {
+                    }
+                    else {
+                        if (modelview.isInvalideSession()) {
+                            request.getSession().invalidate();
+                        }
+                        for (String each : modelview.getSessionDestroy()) {
+                            request.getSession().removeAttribute(each);
+                        }
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                         requestDispatcher.forward(request, response);
                     }
