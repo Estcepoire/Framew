@@ -83,7 +83,7 @@ public class Emp {
     @Url(url="get-form")
     public Modelview getForm() {
         Modelview m = new Modelview();
-        System.out.println(this.getFile().getName());
+        m.setInvalideSession(true);
         m.setView("Ay.jsp");
         return m;
     }
@@ -106,6 +106,15 @@ public class Emp {
         return m;
     }
     
+    @Url(url = "sessionDestroy")
+    public Modelview sessionDestroy() {
+        Modelview m = new Modelview();
+        m.destroy("profile");
+        m.destroy("isConnected");
+        m.setView("index.jsp");
+        return m;
+    }
+
     @Session
     @Url(url = "session")
     public Modelview testSession() {
