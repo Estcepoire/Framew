@@ -125,6 +125,12 @@ public class FrontServlet extends HttpServlet {
                 if (this.singleton.containsKey(clazz.getName())) {
                     if (this.singleton.get(clazz.getName()) != null) {
                         object = this.singleton.get(clazz.getName());
+                        for(Field f : fields ){
+                            String s1 = fields[w].getName().substring(0, 1).toUpperCase();
+                            String seter = s1 + fields[w].getName().substring(1);
+                            Method me = clazz.getMethod("set" + seter, f.getType());
+                            me.invoke(object, null);
+                        }
                     } else {
                         object = clazz.getConstructor().newInstance();
                         this.singleton.replace(clazz.getName(), null, object);
